@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="logAdvisorTarget" class="com.fzw.aop.LogAdvisior"/>
+	<bean id="logAdvisor"
+		class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice">
+			<ref local="logAdvisorTarget" />
+		</property>
+		<property name="patterns">
+			<list>
+				<value>.*</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="qaAdvisorTarget" class="com.fzw.aop.QAAdvisior">
+	<property name="adapter">
+		<bean class="com.legaldaily.estension.ecard.view.adapt.php.PHPQAAdapter"></bean>
+	</property>
+	</bean>
+	<bean id="qaAdvisor"
+		class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice">
+			<ref local="qaAdvisorTarget" />
+		</property>
+		<property name="patterns">
+			<list>
+				<value>.*</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="sideRepository" class="com.legaldaily.estension.ecard.repository.SideRepositoryDao" />
+	<bean id="lawRepository" class="com.legaldaily.estension.ecard.repository.LawRepositoryDao" />
+	<bean id="userRepository" class="com.legaldaily.estension.ecard.repository.UserRepositoryDao" />
+	<bean id="answerRepository" class="com.legaldaily.estension.ecard.repository.AnswerRepositoryDao" />
+	<bean id="areaRepository" class="com.legaldaily.estension.ecard.repository.AreaRepositoryDao" />
+	<bean id="questionRepository" class="com.legaldaily.estension.ecard.repository.QuestionRepositoryDao" />
+	<bean id="postRepository" class="com.legaldaily.estension.ecard.repository.PostRepositoryDao" />
+	
+	<bean id="qarecommend" class="com.legaldaily.estension.ecard.service.qarecommend.QARecommendImpl">
+		<constructor-arg>
+			<ref bean="questionRepository"></ref>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="qarecommendService" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="proxyInterfaces">
+			<value>com.legaldaily.estension.ecard.service.qarecommend.IQARecommend</value>
+		</property>
+		<property name="target">
+			<ref local="qarecommend" />
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>qaAdvisor</value>
+				<value>logAdvisor</value>
+			</list>
+		</property>
+	</bean>
+	
+	
+	
+	<bean id="post" class="com.legaldaily.estension.ecard.service.post.PostServiceImpl">
+		<constructor-arg>
+			<ref bean="postRepository"></ref>
+		</constructor-arg>
+	</bean>
+	<bean id="postService" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="proxyInterfaces">
+			<value>com.legaldaily.estension.ecard.service.post.PostServices</value>
+		</property>
+		<property name="target">
+			<ref local="post" />
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>logAdvisor</value>
+			</list>
+		</property>
+	</bean>
+	
+	
+	<bean id="areaService" class="com.legaldaily.estension.ecard.service.area.AreaServicesConvey">
+		<constructor-arg>
+			<ref bean="areaRepository"></ref>
+		</constructor-arg>
+	</bean>
+	<bean id="questionService" class="com.legaldaily.estension.ecard.service.question.QuestionServicesConvey">
+		<constructor-arg>
+			<ref bean="questionRepository"></ref>
+		</constructor-arg>
+	</bean>
+	<bean id="answerService" class="com.legaldaily.estension.ecard.service.question.AnswerServicesConvey">
+		<constructor-arg>
+			<ref bean="answerRepository"></ref>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="lawService" class="com.legaldaily.estension.ecard.service.law.LawServicesConvey">
+		<constructor-arg>
+			<ref bean="lawRepository"></ref>
+		</constructor-arg>
+	</bean>
+	<bean id="sideService" class="com.legaldaily.estension.ecard.service.side.SideServicesConvey">
+		<constructor-arg>
+			<ref bean="sideRepository"></ref>
+		</constructor-arg>
+	</bean>
+	<bean id="userService" class="com.legaldaily.estension.ecard.service.users.UserServicesConvey">
+		<constructor-arg>
+			<ref bean="userRepository"></ref>
+		</constructor-arg>
+	</bean>
+</beans>

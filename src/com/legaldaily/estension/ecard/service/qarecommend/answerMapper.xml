@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.legaldaily.estension.ecard.question">
+
+	<resultMap id="answerMap" type="answer">
+		<result property="id" column="a_id" />
+		<result property="question.qid" column="q_id" />
+		<result property="content" column="a_content" />
+		<result property="answer_time" column="a_time" />
+		<result property="ip" column="au_ip" />
+		<result property="score" column="get_score" />
+		<result property="user.uid" column="u_id" />
+		<result property="visible" column="a_stats" />
+		<result property="check_flag" column="check_flag" />
+		<!-- <association property="user" column="u_id" javaType="userinfo" -->
+		<!-- select="selectUserInfo" /> -->
+	</resultMap>
+
+	<!-- select one answer -->
+	<select id="selectAnswerInfo" parameterType="long" resultMap="answerMap">
+		SELECT * FROM answers where a_id=#{aid}
+	</select>
+
+	<!-- getBestAnswerID from QuestionID -->
+	<select id="selectBestAnswer" parameterType="long" resultMap="answerMap">
+		SELECT * FROM answers where q_id=#{qid} and a_victory='1' limit 1
+	</select>
+
+	<select id="selectAnswers" parameterType="long" resultMap="answerMap">
+		SELECT * FROM answers where q_id=#{qid} and a_victory='0'
+	</select>
+
+	<select id="selectLawyerAnswers" resultType="long">
+		select d.a_id
+		from questions a,users c,answers d
+		where
+		<if test="!value2">
+		d.check_flag ='0' and 
+		</if> 
+		d.u_id=c.u_id and c.u_group=(select s_value
+		from sv_value where s_title='default_lawyers') and a.q_id=d.q_id
+		order by d.q_id desc,a.q_time desc limit #{value0},#{value1}
+	</select>
+	<select id="selectLawyerAnswersCount" resultType="int">
+		select count(1)
+		from questions a,users c,answers d
+		where
+		<if test="!value0">
+		d.check_flag ='0' and 
+		</if>  
+		d.u_id=c.u_id and c.u_group=(select s_value
+		from sv_value where s_title='default_lawyers') and a.q_id=d.q_id
+	</select>
+	<select id="selectNetfriendsAnswers" resultType="long">
+		select d.a_id
+		from questions a,users c,answers d
+		where 
+		<if test="!value2">
+		d.check_flag ='0' and 
+		</if> 
+		d.u_id=c.u_id and c.u_group!=(select s_value
+		from sv_value where s_title='default_lawyers') and a.q_id=d.q_id
+		order by d.q_id desc,a.q_time desc limit #{value0},#{value1}
+	</select>
+	<select id="selectNetfriendsAnswersCount" resultType="long">
+		select count(1)
+		from questions a,users c,answers d
+		where 
+		<if test="!value0">
+		d.check_flag ='0' and 
+		</if> 
+		d.u_id=c.u_id and c.u_group!=(select s_value
+		from sv_value where s_title='default_lawyers') and a.q_id=d.q_id
+	</select>
+
+
+	<select id="selectAnswerByCondition" parameterType="answercond"
+		resultType="long">
+		SELECT * FROM answers where 1=1
+		<if test="startTime != null">
+		<![CDATA[
+			and a_time>#{startTime}
+		]]>
+		</if>
+		<if test="content != null and content != ''">
+			and a_content like #{content}
+		</if>
+		<if test="endTime != null">
+		<![CDATA[
+			and a_time<#{endTime}
+		]]>
+		</if>
+		<if test="visible != null and visible != ''">
+			and a_stats = #{visible}
+		</if>
+		<if test="check != null and check != ''">
+			and check_flag = #{check}
+		</if>
+		<if test="satisfy != null and satisfy != ''">
+			and a_victory = #{satisfy}
+		</if>
+		<if test="scoreMark == 1">
+			and get_score = #{score}
+		</if>
+		<if test="scoreMark == 2 ">
+		<![CDATA[
+			and get_score < #{score}
+		]]>
+		</if>
+		<if test="scoreMark == 3">
+		<![CDATA[
+			and get_score > #{score}
+		]]>
+		</if>
+		<if test="orderby != null and orderby != ''">
+			order by ${orderby}
+		</if>
+		limit #{startpos},#{count}
+	</select>
+
+	<select id="selectAnswerByConditionCount" parameterType="answercond"
+		resultType="long">
+		SELECT count(8) FROM answers where 1=1
+		<if test="startTime != null">
+		<![CDATA[
+			and a_time>#{startTime}
+		]]>
+		</if>
+		<if test="content != null and content != ''">
+			and a_content like #{content}
+		</if>
+		<if test="endTime != null">
+		<![CDATA[
+			and a_time<#{endTime}
+		]]>
+		</if>
+		<if test="visible != null and visible != ''">
+			and a_stats = #{visible}
+		</if>
+		<if test="check != null and check != ''">
+			and check_flag = #{check}
+		</if>
+		<if test="satisfy != null and satisfy != ''">
+			and a_victory = #{satisfy}
+		</if>
+		<if test="scoreMark == 1">
+			and get_score = #{score}
+		</if>
+		<if test="scoreMark == 2 ">
+		<![CDATA[
+			and get_score < #{score}
+		]]>
+		</if>
+		<if test="scoreMark == 3">
+		<![CDATA[
+			and get_score > #{score}
+		]]>
+		</if>
+	</select>
+
+	<insert id="insertAnswer" parameterType="answer">
+		insert into
+		answers(q_id,u_id,au_ip,a_content,a_time,get_score,a_stats)
+		values(#{question.qid},#{user.uid},#{ip},#{content},#{answer_time},#{score},#{visible})
+	</insert>
+
+	<update id="updateReplyCount" parameterType="int">
+		update questions set
+		rep_values=rep_values+1 where q_id=#{qid}
+	</update>
+
+	<update id="decreaseReplyCount" parameterType="int">
+		update questions
+		set
+		rep_values=rep_values-1 where q_id=#{qid}
+	</update>
+
+	<select id="increastOneUserAnswerMeta" parameterType="int">
+		update
+		user_meta set answer_cnt=answer_cnt+1 where user_id=#{userId}
+	</select>
+	<insert id="insertNewUserAnswerMeta" parameterType="int">
+		insert into
+		user_meta(user_id,answer_cnt) values(#{userId},1)
+	</insert>
+
+	<update id="updateUserScore" parameterType="answer">
+		update users set
+		u_score=u_score+${score} where u_id=#{user.uid}
+	</update>
+
+	<update id="updateAnswer" parameterType="answer">
+		update answers set
+		a_content=#{content}
+		<if test="check_flag != null and check_flag != ''">
+			,check_flag=#{check_flag}
+		</if>
+		 where a_id=#{id}
+	</update>
+
+	<update id="passAnswer" parameterType="object">
+		update answers set a_stats='1',check_flag='1' where a_id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="forbitAnswer" parameterType="object">
+		update answers set a_stats='0',check_flag='1' where a_id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<!-- and u_id=1 and a_stats='1' -->
+	<update id="setBestAnswerScore" parameterType="answer">
+		update answers set
+		a_victory='1',get_score=get_score+(select s_value from
+		sv_value where
+		s_title='good_answer_score')
+		where a_id=#{id}
+	</update>
+	<update id="setBestAnswerUserScore" parameterType="answer">
+		update users
+		set u_score=u_score+(select s_value from
+		sv_value where
+		s_title='good_answer_score') where u_id=#{user.uid}
+	</update>
+	<update id="setBestAnswerSatisfy" parameterType="answer">
+		update questions
+		set q_lock='1' where q_id=#{question.qid}
+	</update>
+	<!-- and u_id=1 and a_stats='1' -->
+	<update id="unsetBestAnswerScore" parameterType="answer">
+		update answers
+		set a_victory='0',get_score=get_score-(select s_value from
+		sv_value
+		where s_title='good_answer_score')
+		where a_id=#{id}
+	</update>
+	<update id="unsetBestAnswerUserScore" parameterType="answer">
+		update users
+		set u_score=u_score-(select s_value from
+		sv_value where
+		s_title='good_answer_score') where u_id=#{user.uid}
+	</update>
+	<update id="unsetBestAnswerSatisfy" parameterType="answer">
+		update
+		questions set q_lock='0' where q_id=#{question.qid}
+	</update>
+</mapper>

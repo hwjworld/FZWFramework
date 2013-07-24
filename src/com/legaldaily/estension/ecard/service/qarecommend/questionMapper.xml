@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.legaldaily.estension.ecard.question">
+
+	<!-- <cache type="org.mybatis.ehcache.EhcacheCache"/> -->
+
+	<resultMap id="questionMap" type="question">
+		<constructor>
+			<idArg column="q_id" javaType="_long" />
+			<arg column="q_title" javaType="string" />
+			<arg column="q_content" javaType="string" />
+		</constructor>
+		<result property="createtime" column="q_time" />
+		<result property="question_ip" column="u_ip" />
+		<result property="lawCategory.catId" column="g_id" />
+		<result property="province.areaId" column="province_id" />
+		<result property="replaycount" column="rep_values" typeHandler="longTypeHandler" />
+		<result property="isCheck" column="check_flag" />
+		<result property="order" column="in_turn" />
+		<result property="score" column="q_value" />
+		<result property="visible" column="q_stats" />
+		<result property="satisfied" column="q_lock" />
+		<result property="user.uid" column="u_id" />
+		<result property="addContent" column="add_content" />
+		<result property="addStats" column="add_stats" />
+		<result property="addCheck" column="add_check" />
+		<result property="pv" column="pv_values" />
+		<association property="bestAnswer" column="q_id" javaType="answer"
+			select="selectBestAnswer" />
+		<!-- <association property="user" column="u_id" javaType="userinfo" -->
+		<!-- select="selectUserInfo" /> -->
+		<collection property="answers" javaType="ArrayList" column="q_id"
+			ofType="answer" resultMap="answerMap" select="selectAnswers" />
+	</resultMap>
+
+
+	<!-- select one question -->
+	<select id="selectQuestionInfo" parameterType="_long" resultMap="questionMap">
+		select * from questions where q_id=#{qid}
+	</select>
+
+	<!-- select stat=1 and lock=1 order by in_turn desc,a_time desc -->
+	<select id="selectVisibleAndSatisfyQuestions" parameterType="questioncond"
+		resultType="long">
+		select SQL_CALC_FOUND_ROWS distinct q_id from (
+		select q.q_id
+		from
+		questions q,answers a
+		where q.q_stats='1'
+		and q.q_lock='1' and
+		a.q_id=q.q_id
+		<if test="provinceId != 0">
+		<![CDATA[
+			and q.province_id=#{provinceId}
+		]]>
+		</if>
+		<choose>
+			<when test="orderby != null and orderby != ''">
+				order by ${orderby}
+			</when>
+			<otherwise>
+				order by q.in_turn desc, a.a_time desc
+			</otherwise>
+		</choose>
+		limit #{startpos},#{count}
+		) aa
+	</select>
+
+	<!-- select stat=1 order by in_turn desc -->
+	<select id="selectVisibleQuestions" parameterType="questioncond"
+		resultType="long">
+		select SQL_CALC_FOUND_ROWS distinct q_id from (
+		select q_id
+		from
+		questions
+		where q_stats='1'
+		<if test="provinceId != 0">
+		<![CDATA[
+			and province_id=#{provinceId}
+		]]>
+		</if>
+		and q_lock='0'
+		<choose>
+			<when test="orderby != null and orderby != ''">
+				order by ${orderby}
+			</when>
+			<otherwise>
+				order by q_id desc
+			</otherwise>
+		</choose>
+		limit #{startpos},#{count}
+		) aa
+	</select>
+	<!-- SQL_CALC_FOUND_ROWS -->
+	<select id="selectQuestions" parameterType="questioncond"
+		resultType="long">
+		select q_id
+		from questions
+		where 1=1
+		<if test="startTime != null and startTime != ''">
+		<![CDATA[
+			and q_time>#{startTime}
+		]]>
+		</if>
+		<if test="endTime != null and endTime != ''">
+		<![CDATA[
+			and q_time<#{endTime}
+		]]>
+		</if>
+		<choose>
+		<when test="title != null and title != '' and content != null and content != ''">
+			and (q_title like #{title} or q_content like #{content})
+		</when>
+		<when test="title != null and title != ''">
+			and q_title like #{title}
+		</when>
+		<when test="content != null and content != ''">
+			and q_content like #{content}
+		</when>
+		</choose>
+		<if test="visible != null and visible != ''">
+			and q_stats = #{visible}
+		</if>
+		<if test="check != null and check != ''">
+			and check_flag = #{check}
+		</if>
+		<if test="satisfy != null and satisfy != ''">
+			and q_lock = #{satisfy}
+		</if>
+		<if test="userId > 0 ">
+		<![CDATA[
+			and u_id = #{userId}
+		]]>
+		</if>
+		<if test="replyCountMark == 1">
+			and rep_values = #{replyCount}
+		</if>
+		<if test="replyCountMark == 2 ">
+		<![CDATA[
+			and rep_values < #{replyCount}
+		]]>
+		</if>
+		<if test="replyCountMark == 3">
+		<![CDATA[
+			and rep_values > #{replyCount}
+		]]>
+		</if>
+		<if test="scoreValueMark == 1">
+			and q_value = #{scoreValue}
+		</if>
+		<if test="scoreValueMark == 2 ">
+		<![CDATA[
+			and q_value < #{scoreValue}
+		]]>
+		</if>
+		<if test="scoreValueMark == 3">
+		<![CDATA[
+			and q_value > #{scoreValue}
+		]]>
+		</if>
+		<if test="provinceId != 0">
+		<![CDATA[
+			and province_id = #{provinceId}
+		]]>
+		</if>
+		<if test="orderby != null and orderby != ''">
+			order by ${orderby}
+		</if>
+		limit #{startpos},#{count}
+	</select>
+	<select id="selectSolvedQuestionsCount" resultType="long">
+		select
+		count(a.q_id) from answers a,questions q,users u,q_group g where
+		g.g_id=q.g_id and a.a_stats='1' and a.u_id=u.u_id and a.q_id=q.q_id
+		and q.q_stats='1' and q.q_lock='1' and a.a_victory='1'
+	</select>
+
+
+	<select id="selectQuestionsCount" parameterType="questioncond"
+		resultType="long">
+		select count(*) from (
+		select q_id
+		from questions
+		where 1=1
+		<if test="startTime != null and startTime != ''">
+		<![CDATA[
+			and q_time>#{startTime}
+		]]>
+		</if>
+		<if test="endTime != null and endTime != ''">
+		<![CDATA[
+			and q_time<#{endTime}
+		]]>
+		</if>
+		<choose>
+		<when test="title != null and title != '' and content != null and content != ''">
+			and (q_title like #{title} or q_content like #{content})
+		</when>
+		<when test="title != null and title != ''">
+			and q_title like #{title}
+		</when>
+		<when test="content != null and content != ''">
+			and q_content like #{content}
+		</when>
+		</choose>
+		<if test="visible != null and visible != ''">
+			and q_stats = #{visible}
+		</if>
+		<if test="check != null and check != ''">
+			and check_flag = #{check}
+		</if>
+		<if test="satisfy != null and satisfy != ''">
+			and q_lock = #{satisfy}
+		</if>
+		<if test="userId > 0 ">
+		<![CDATA[
+			and u_id = #{userId}
+		]]>
+		</if>
+		<if test="replyCountMark == 1">
+			and rep_values = #{replyCount}
+		</if>
+		<if test="replyCountMark == 2 ">
+		<![CDATA[
+			and rep_values < #{replyCount}
+		]]>
+		</if>
+		<if test="replyCountMark == 3">
+		<![CDATA[
+			and rep_values > #{replyCount}
+		]]>
+		</if>
+		<if test="scoreValueMark == 1">
+			and q_value = #{scoreValue}
+		</if>
+		<if test="scoreValueMark == 2 ">
+		<![CDATA[
+			and q_value < #{scoreValue}
+		]]>
+		</if>
+		<if test="scoreValueMark == 3">
+		<![CDATA[
+			and q_value > #{scoreValue}
+		]]>
+		</if>
+		<if test="provinceId != 0">
+		<![CDATA[
+			and province_id = #{provinceId}
+		]]>
+		</if>
+		) aa
+	</select>
+
+	<insert id="insertQuestion" parameterType="question">
+		insert into
+		questions
+		(u_id,u_ip,g_id,q_title,q_content,q_time,q_value,province_id,q_stats,rep_values,add_content)
+		values
+		(#{user.uid},#{question_ip},#{lawCategory.catId},#{title},#{content},#{createtime},#{score},#{province.areaId},#{visible},0,'')
+	</insert>
+
+	<select id="increastOneUserQuestionMeta" parameterType="int">
+		update
+		user_meta set question_cnt=question_cnt+1 where user_id=#{userId}
+	</select>
+	<insert id="insertNewUserQuestionMeta" parameterType="int">
+		insert into
+		user_meta(user_id,question_cnt) values(#{userId},1)
+	</insert>
+	<select id="isExistUserMeta" parameterType="int" resultType="int">
+		select count(*) from user_meta where user_id=#{userId}
+	</select>
+
+	<update id="updateQuestion" parameterType="question">
+		update questions set
+		q_title=#{title}
+		<if test="lawCategory.catId>0">
+		,g_id=#{lawCategory.catId}
+		</if>
+		<if test="content!=null and content!= ''">
+		,q_content=#{content}
+		</if>
+		<if test="province.areaId>0">
+		,province_id=#{province.areaId}
+		</if>
+		where q_id=#{qid}
+	</update>
+
+	<delete id="deleteQuestion" parameterType="long">
+		update questions set
+		q_stats='0',check_flag='1' where q_id = #{qid}
+	</delete>
+
+	<update id="passQuestion" parameterType="long">
+		update questions set
+		q_stats='1',check_flag='1' where q_id = #{qid}
+	</update>
+
+	<update id="passQuestionsAddcontent" parameterType="long">
+		update questions set add_stats='1',add_check='1' where q_id = #{qid}
+	</update>
+	<update id="forbidQuestionAddcontent" parameterType="long">
+		update questions set add_stats='0',add_check='1'  where q_id = #{qid}
+	</update>
+	<update id="setBestAnswer" parameterType="answer">
+		update answers set
+		a_victory=1,get_score=${score}+(select s_value from sv_value where
+		s_title='good_answer_score') where a_id=#{id} and u_id=#{user.uid} and
+		a_stats='1'
+	</update>
+	<update id="unsetBestAnswer" parameterType="question">
+		update answers set
+		a_victory=0,get_score=${bestAnswer.score}-(select s_value from
+		sv_value where s_title='good_answer_score') where
+		a_id=#{bestAnswer.id} and u_id=#{bestAnswer.user.uid} and a_stats='1'
+	</update>
+
+	<update id="setBestUpdateUserScore" parameterType="answer">
+		update users
+		set
+		u_score=u_score+${score}+(select s_value from sv_value where
+		s_title='good_answer_score') where u_id=#{user.uid}
+	</update>
+
+	<update id="unsetBestUpdateUserScore" parameterType="question">
+		update users
+		set
+		u_score=u_score-${bestAnswer.score}-(select s_value from sv_value
+		where s_title='good_answer_score') where u_id=#{bestAnswer.user.uid}
+	</update>
+
+	<select id="getLatestSolvedQuestionByGroup" parameterType="questioncond"
+		resultType="long">
+		select distinct q.q_id
+		from answers a,questions q
+		where
+		a.a_stats='1' and a.q_id=q.q_id and q.q_stats='1' and
+		q.g_id=#{groupId}
+		group by q_id
+		order by a_time desc limit #{count}
+	</select>
+	
+	<select id="selectAddContentQuestions" resultType="long">
+		select  a.q_id
+		from questions a
+		where 
+		<if test='!value2'>
+		a.check_flag='0' and
+		</if>
+		a.add_content!=''
+		order by a.q_time desc limit #{value0},#{value1}
+	</select>
+	
+	<select id="selectAddContentQuestionsCount" parameterType="map" resultType="int">
+		select count(1)
+		from questions a
+		where 
+		<if test='!value0'>
+		a.check_flag='0' and
+		</if>
+		a.add_content!=''
+	</select>
+	<select id="selectMemberQuestions" resultType="long">
+		select a.q_id
+		from
+		questions a, users c
+		where a.u_id=c.u_id and c.u_group!=(select s_value
+		from sv_value where
+		s_title='default_netfriend')
+		<if test='!value2'>
+		and a.check_flag='0'
+		</if>
+		order by a.q_time desc limit #{value0},#{value1}
+	</select>
+	
+	<select id="selectMemberQuestionsCount" parameterType="map" resultType="int">
+		select
+		count(*) from questions a, users c where a.u_id=c.u_id and
+		c.u_group!=(select s_value from sv_value where
+		s_title='default_netfriend')
+		<if test='!value0'>
+		and a.check_flag='0'
+		</if>
+	</select>
+	<select id="selectNetFriendsQuestionsCount" resultType="int">
+		select
+		count(1) from questions a, users c where a.u_id=c.u_id and
+		c.u_group=(select s_value from sv_value where
+		s_title='default_netfriend')
+		<if test='!value0'>
+		and a.check_flag='0'
+		</if>
+	</select>
+	<select id="selectNetFriendsQuestions" resultType="long">
+		select a.q_id
+		from questions a,users c
+		where a.u_id=c.u_id and c.u_group=(select
+		s_value
+		from sv_value where
+		s_title='default_netfriend')
+		<if test='!value2'>
+		and a.check_flag='0'
+		</if>
+		order by a.q_time desc limit #{value0},#{value1}
+	</select>
+
+	<select id="selectAllQuestions" resultMap="questionMap">
+		select * from
+		questions
+	</select>
+	<select id="selectAllQuestionsCount" resultType="int">
+		select count(1)
+		from questions
+	</select>
+
+	<select id="selectQuestionLargerIds" parameterType="_long"
+		resultType="long">
+		select q.q_id from questions q where q.q_id>#{questiondid}
+	</select>
+
+	<update id="setAddContent" parameterType="map">
+		update questions set
+		add_content=#{value} where q_id=#{key}
+	</update>
+	<update id="setQuestionOrder" parameterType="map">
+		update questions set
+		in_turn=#{value} where q_id=#{key}
+	</update>
+	<update id="addQuestionPv" parameterType="long">
+		update questions set pv_values=pv_values+1 where q_id=#{qid}
+	</update>
+
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.legaldaily.estension.ecard.post">
+
+	<resultMap id="postMap" type="post">
+		<result property="postid" column="ID" />
+		<result property="postDate" column="post_date"
+			typeHandler="dateTypeHandler" />
+		<result property="content" column="post_content"
+			typeHandler="stringTypeHandler" />
+		<result property="contentLink" column="content_link" />
+		<result property="title" column="post_title" />
+		<result property="linkTitle" column="link_title" />
+		<result property="commentCount" column="comment_count" />
+		<result property="attachmentUrl" column="attachment_url" />
+		<result property="author.uid" column="post_author" />
+		<result property="category.catId" column="post_category" />
+		<result property="status.postStatus" column="post_status" />
+		<result property="status.commentStatus" column="comment_status" />
+		<result property="status.isAudit" column="check_flag" />
+		<result property="status.pv" column="pv_value" />
+		<result property="status.order" column="menu_order" />
+
+	</resultMap>
+
+	<resultMap id="postStatusMap" type="poststatus">
+		<result property="postStatus" column="post_status" />
+		<result property="commentStatus" column="comment_status" />
+		<result property="isAudit" column="check_flag" />
+		<result property="pv" column="pv_value" />
+		<result property="order" column="menu_order" />
+	</resultMap>
+
+	<resultMap id="postCategoryMap" type="postCategory">
+		<result property="catId" column="cat_id" />
+		<result property="catName" column="cat_name" />
+		<result property="creatTime" column="creat_time" />
+		<result property="parentId" column="parent_id" />
+		<result property="posts_cnt" column="posts_cnt" />
+		<result property="editors" column="editors" />
+	</resultMap>
+
+
+
+	<select id="selectPostInfo" parameterType="int" resultMap="postMap">
+		SELECT * FROM posts where ID=#{postid}
+	</select>
+
+	<select id="selectPostStatus" parameterType="int" resultMap="postStatusMap">
+		SELECT * FROM posts where ID=#{postid}
+	</select>
+
+	<select id="selectAllPostCategories" resultMap="postCategoryMap">
+		SELECT * FROM post_cats
+	</select>
+	<select id="selectPostCategory" parameterType="int" resultMap="postCategoryMap">
+		SELECT * FROM post_cats where cat_id=#{catId}
+	</select>
+	
+	<select id="selectAllPosts" resultMap="postMap">
+		SELECT * FROM posts
+	</select>
+
+	<insert id="insertPost" parameterType="post">
+		insert into
+		posts(post_author,post_content,post_title,post_category,attachment_url,link_title,content_link,post_status,menu_order)
+		values(#{author.uid},#{content},#{title},#{category.catId},#{attachmentUrl},#{linkTitle},#{contentLink},#{status.postStatus},'1')
+	</insert>
+	<insert id="increaseOnePostCount" parameterType="int">
+		update post_cats set posts_cnt=posts_cnt+1 where cat_id=#{catId}
+	</insert>
+	<update id="updatePost" parameterType="post">
+		update posts set
+		post_author=#{author.uid},
+		post_content=#{content},
+		post_title=#{title},
+		post_category=#{category.catId},
+		attachment_url=#{attachmentUrl},
+		link_title=#{linkTitle},
+		content_link=#{contentLink},
+		post_status=#{status.postStatus}
+		where
+		ID=#{postid}
+	</update>
+
+	<delete id="deletePost" parameterType="int">
+		delete from  posts  where ID=#{postid}
+	</delete>
+
+	<update id="decreaseOnePostCount" parameterType="int">
+		update post_cats set posts_cnt=posts_cnt-1 where cat_id=#{catId}
+	</update>
+	<update id="updatePostStatus" parameterType="map">
+		update posts set post_status=#{value} where ID=#{key}
+	</update>
+	<update id="changeorder" parameterType="map">
+		update posts set menu_order=#{value1} where ID=#{value0}
+	</update>
+</mapper>

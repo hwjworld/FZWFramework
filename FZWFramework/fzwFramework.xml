@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<legaldaily-fzwframework>
+	<!-- fzwFramework版本 -->
+	<version>0.0.2</version>
+	<port>8410</port>
+	<!-- get, json, xml(todo) -->
+	<messagetype>json</messagetype>
+	<extension>
+		<!-- 每个插件所使用最大数据库连接数 -->
+		<dbconn-limit>50</dbconn-limit>
+		<!-- 每个插件所能使用的最大缓存数 -->
+		<cache-limit>20</cache-limit>
+	</extension>
+	<!-- 命令处理方式,
+	1必须指定processer,即extensionname
+	2顺序查找符合的消息名 -->
+	<commandprocess>1</commandprocess>
+</legaldaily-fzwframework>

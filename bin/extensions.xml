@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<legaldaily-extensions>
+	<extension>
+		<name>comment</name>
+		<enable>0</enable>
+		<init>com.legaldaily.estension.comment.CommentInit</init>
+		<dbconfiguration>com/legaldaily/estension/comment/dao/commentDBConfig.xml</dbconfiguration>
+<!-- 		<cache>ip,idcard</cache> -->
+		<commands>
+			<command name="com.legaldaily.estension.comment.ValidationCommands" />
+		</commands>
+	</extension>
+	<extension>
+		<name>ecard</name>
+		<enable>1</enable>
+		<init>com.legaldaily.estension.ecard.EcardInit</init>
+		<dbconfiguration>com/legaldaily/estension/ecard/repository/dao/Configuration.xml</dbconfiguration>
+		<resultformatter>com.legaldaily.estension.ecard.view.adapt.EcardResultFormatter</resultformatter>
+<!-- 		<cache>Question,Answer,User,RecommendQuestion,WaitRecommendQuestion,QuestionGroup,UserGroup,Posts,PostCategory,cities,provinces,lawcases,lawoffice,lawyer,lawcategory</cache> -->
+		<commands>
+			<command name="com.legaldaily.estension.ecard.service.command.AreaCommands" />
+			<command name="com.legaldaily.estension.ecard.service.command.PostCommands" />
+			<command name="com.legaldaily.estension.ecard.service.command.QACommands" />
+			<command name="com.legaldaily.estension.ecard.service.command.QuestionCommands" />
+			<command name="com.legaldaily.estension.ecard.service.command.LawCommands" />
+			<command name="com.legaldaily.estension.ecard.service.command.AnswerCommands" />
+			<command name="com.legaldaily.estension.ecard.service.command.UserCommands" />
+			<command name="com.legaldaily.estension.ecard.service.command.SideCommands" />	
+		</commands>
+	</extension>
+</legaldaily-extensions>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.legaldaily.estension.ecard.user">
+
+	<resultMap id="userMap" type="userinfo">
+		<result property="uid" column="u_id" />
+		<result property="loginname" column="login_name" />
+		<result property="nickname" column="nick_name" />
+		<result property="regtime" column="reg_time" typeHandler="dateTypeHandler" />
+		<result property="email" column="u_email" />
+		<result property="headpic" column="headpic" />
+		<result property="userGroup.groupid" column="u_group" />
+		<result property="score" column="u_score" />
+		<result property="sex" column="u_sexes" />
+	</resultMap>
+
+	<resultMap id="userGroupMap" type="userGroup">
+		<result property="groupid" column="ug_id" />
+		<result property="groupname" column="ug_name" />
+		<result property="u_rulers" column="u_rulers" />
+		<result property="s_rulers" column="s_rulers" />
+	</resultMap>
+
+	<resultMap id="scoreMap" type="score">
+		<result property="user.uid" column="u_id" />
+		<result property="totalScore" column="score" />
+	</resultMap>
+
+	<select id="selectUserInfo" parameterType="int" resultMap="userMap">
+		select * from users where u_id=#{uid}
+	</select>
+
+
+	<select id="selectUserGroup" parameterType="int" resultMap="userGroupMap">
+		select * from u_group where ug_id=#{groupid}
+	</select>
+
+	<select id="selectAllUsers" resultMap="userMap">
+		select * from users
+	</select>
+	<select id="selectAllUsersCount" resultType="int">
+		select count(*) from
+		users
+	</select>
+
+	<select id="selectAllUserGroups" resultMap="userGroupMap">
+		select * from u_group
+	</select>
+
+	<select id="getScoreRank" parameterType="usercond" resultMap="scoreMap">
+		<![CDATA[
+			select a.u_id,u.nick_name,sum(a.get_score) as score from answers a,users u
+			where 1=1 
+		]]>
+
+		<if test="starttime != null and starttime != ''">
+		<![CDATA[
+			and a.a_time>#{starttime}
+		]]>
+		</if>
+
+		<if test="endtime != null and endtime != ''">
+		<![CDATA[
+			and a.a_time<#{endtime} 
+		]]>
+		</if>
+		<![CDATA[
+		 and
+		a.u_id=u.u_id and u_group=6 and a.u_id not in (165,166,167,168,169)
+		group by u_id order by score desc
+		]]>
+		limit ${count}
+	</select>
+	<update id="setUserGroup" parameterType="map">
+		update users set
+		u_group=#{value} where u_id=#{key} and u_id!=1 and u_id!=2
+	</update>
+	<insert id="insertUser" parameterType="userinfo">
+		insert into
+		users(login_name,nick_name,pass_word,u_email,u_score,u_sexes,u_group,headpic,ue_blacklist,ue_frlist)
+		values(#{loginname},#{nickname},#{password},#{email},(select s_value from sv_value where s_title='default_score_values'),
+		#{sex},(select s_value from sv_value where s_title='default_reg_group'),'/ecard/upload/defaultpic.gif','','')
+	</insert>
+</mapper>

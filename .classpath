@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="FZWFramework"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_24"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/cglib-2.2.2.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/commons-beanutils-1.8.3.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/commons-beanutils-bean-collections-1.8.3.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/commons-beanutils-core-1.8.3.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/commons-collections-3.2.1.jar" sourcepath="/p/software/java/plugins/apache/collections/commons-collections-3.2.1-src.zip"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/commons-configuration-1.6.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/ehcache-probe-1.0.2.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/gson-1.7.1.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/log4j-1.2.13.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/mybatis-3.0.5.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/mybatis-ehcache-1.0.0.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/mysql-connector-java-5.1.16-bin.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/org.springframework.aop-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/org.springframework.asm-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/org.springframework.beans-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/org.springframework.context-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/org.springframework.core-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/org.springframework.expression-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/picocontainer-1.1.jar"/>
+	<classpathentry kind="lib" path="/onlyjar/mongo-2.6.5.jar" sourcepath="/p/software/java/plugins/mongodb/mongodb-mongo-java-driver-r2.6.5-61-g9e25f38.zip"/>
+	<classpathentry kind="lib" path="/onlyjar/lib/commons-io-1.4.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/mina-core-2.0.4.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/mina-example-2.0.4.jar" sourcepath="/p/software/java/plugins/apache/mina/apache-mina-2.0.4-src.zip"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/morphia-0.99.jar" sourcepath="/p/software/java/plugins/codegoogle/morphia/morphia-read-only/morphia"/>
+	<classpathentry kind="lib" path="/restful/libb/asm-3.3.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/ehcache-core-2.4.4.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="FZWFramework/lib/slf4j-jdk14-1.6.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

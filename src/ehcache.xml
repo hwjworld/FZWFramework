@@ -1,0 +1,12 @@
+<ehcache>
+	<diskStore path="java.io.tmpdir" />
+	<!-- monitor -->
+	<!-- <cacheManagerPeerListenerFactory class="org.terracotta.ehcachedx.monitor.probe.ProbePeerListenerFactory" 
+		properties="monitorAddress=localhost, monitorPort=9889, memoryMeasurement=true" 
+		/> -->
+	<defaultCache maxElementsInMemory="0" eternal="false"
+		timeToIdleSeconds="0" timeToLiveSeconds="0" overflowToDisk="true"
+		maxElementsOnDisk="10000000" diskPersistent="true"
+		diskExpiryThreadIntervalSeconds="0" memoryStoreEvictionPolicy="LRU" />
+
+</ehcache>

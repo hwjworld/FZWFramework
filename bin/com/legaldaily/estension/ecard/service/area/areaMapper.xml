@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fzw.area">
+
+	<resultMap id="provinceMap" type="province">
+		<result property="areaId" column="p_id" />		
+		<result property="areaName" column="p_name" />
+	</resultMap>
+
+	<resultMap id="cityMap" type="city">
+		<result property="areaId" column="c_id" />
+		<result property="areaName" column="c_name" />
+		<result property="cityMap" column="c_map" />
+		<result property="provinceId" column="province_id" />
+	</resultMap>
+	
+	<select id="selectCityInfo" parameterType="int" resultMap="cityMap">
+		SELECT * FROM citys where c_id=#{cityid}
+	</select>
+
+	<select id="selectAllCities" resultMap="cityMap">
+		SELECT * FROM citys
+	</select>
+	
+	<select id="selectAllProvinces" resultMap="provinceMap">
+		SELECT * FROM province
+	</select>
+	
+	<select id="selectProvinceInfo" parameterType="int" resultMap="provinceMap">
+		SELECT * FROM province where p_id=#{provinceid}
+	</select>
+
+	<select id="selectProvinceOrder" parameterType="_int" resultType="_int">
+		SELECT orderby FROM province where p_id=#{provinceid}
+	</select>
+	
+</mapper>

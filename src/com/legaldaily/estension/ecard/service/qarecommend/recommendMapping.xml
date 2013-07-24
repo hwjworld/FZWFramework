@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.legaldaily.estension.ecard.recommend">
+
+	<!-- <cache type="org.mybatis.ehcache.EhcacheCache"/> -->
+
+	<resultMap id="recommendTransientMap" type="recommendTransient">
+		<result property="qid" column="q_id" />
+		<result property="userid" column="editer_id" />
+		<result property="order" column="order_by" />
+		<result property="recommendTime" column="edit_time" />
+	</resultMap>
+
+
+	<!-- select all recommendTransients -->
+	<select id="selectRecommendTransients" parameterType="cond" resultMap="recommendTransientMap">
+		select * from q_tuijian order by order_by desc limit #{count}
+	</select>
+
+	<select id="selectOneRecommendTransient" parameterType="_long" resultMap="recommendTransientMap">
+		select * from q_tuijian where q_id=#{qid}
+	</select>
+	
+	
+	<!-- select recommend question list -->
+<!-- 	<select id="selectRecommendQuestionIDs" resultType="long"> -->
+<!-- 		select q_id -->
+<!-- 		from q_tuijian order by order_by desc limit 15 -->
+<!-- 	</select> -->
+
+
+	<!-- select wait recommend question list
+	 -->
+	<select id="selectWaitRecommendQuestionIDs" parameterType="cond" resultType="long">
+	select a.q_id from questions a where 1=1 and a.q_time between #{startTime} and #{endTime} 
+	<if test="text != null">
+		and a.q_title like #{text}
+	</if>
+	 order by a.q_time desc limit 1000
+	</select>
+	
+	
+	<!-- addRecommend -->
+	<insert id="insertRecommendation" parameterType="recommendation">
+		insert into
+		q_tuijian (q_id,u_id,editer_id,edit_time) values
+		(#{question.qid},#{question.bestAnswer.user.uid},#{referees.uid},#{recommendTime})
+	</insert>
+
+	<!-- deleteRecommend -->
+	<delete id="deleteRecommendation" parameterType="recommendation">
+		delete from
+		q_tuijian
+		where q_id=#{question.qid}
+	</delete>
+	
+	<update id="updateMovePositionStep0" parameterType="hashmap" >
+	<![CDATA[
+	update q_tuijian set order_by=0 where order_by=#{r1.order}
+	]]>
+	</update>
+	
+	<!-- if(r1.order<r2.order) -->
+	<update id="updateMovePositionStep11" parameterType="hashmap">
+	<![CDATA[
+	update q_tuijian set order_by=order_by-1 where order_by>#{r1.order} and order_by<=#{r2.order} order by order_by
+	]]>
+	</update>
+
+	<!-- if(r1.order>r2.order) -->
+	<update id="updateMovePositionStep12" parameterType="hashmap">
+	<![CDATA[
+	update q_tuijian set order_by=order_by+1 where order_by<#{r1.order} and order_by>=#{r2.order} order by order_by desc
+	]]>
+	</update>
+	<update id="updateMovePositionStep2" parameterType="hashmap" >
+	<![CDATA[
+	update q_tuijian set order_by=#{r2.order} where q_id=#{r1.question.qid}
+	]]>
+	</update>
+	
+	
+</mapper>

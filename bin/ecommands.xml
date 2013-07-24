@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<legaldaily-commands>
+	<command name="com.fzw.service.command.AreaCommands" />
+	<command name="com.fzw.service.command.PostCommands" />
+	<command name="com.fzw.service.command.QACommands" />
+	<command name="com.fzw.service.command.QuestionCommands" />
+	<command name="com.fzw.service.command.LawCommands" />
+	<command name="com.fzw.service.command.AnswerCommands" />
+	<command name="com.fzw.service.command.UserCommands" />	
+</legaldaily-commands>

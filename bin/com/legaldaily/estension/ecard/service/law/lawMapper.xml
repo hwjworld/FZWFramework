@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fzw.law">
+
+	<resultMap id="lawcaseMap" type="lawcase">
+		<result property="caseId" column="aid" />
+		<result property="user.uid" column="u_id" />
+		<result property="title" column="case_title" />
+		<result property="category.catId" column="case_cate" />
+		<result property="province.areaId" column="case_province" />
+		<result property="city.areaId" column="case_city" />
+		<result property="location" column="case_locate" />
+		<result property="price" column="case_value" />
+		<result property="offer" column="case_offer" />
+		<result property="description" column="case_desc" />
+		<result property="memo" column="case_mem" />
+		<result property="validity" column="case_limit" />
+		<result property="expireDate" column="case_todate" typeHandler="dateTypeHandler" />
+		<result property="ispub" column="case_ispub" />
+		<result property="pubchars" column="case_pubchars" />
+		<result property="contactName" column="case_contact_name" />
+		<result property="contactEmail" column="case_contact_email" />
+		<result property="contactTelephone" column="case_contact_tele" />
+		<result property="contactMobile" column="case_contact_mobile" />
+		<result property="contactFax" column="case_contact_fax" />
+		<result property="contactAddress" column="case_contact_address" />
+		<result property="contactPostcode" column="case_contact_postcode" />
+		<result property="submitDate" column="case_submit_date"
+			typeHandler="dateTypeHandler" />
+		<result property="caseUserIp" column="case_user_ip" />
+		<result property="isEnd" column="case_end_flag" />
+		<result property="pubState" column="pub_flag" />
+		<result property="isDel" column="del_flag" />
+		<result property="isCheck" column="check_flag" />
+	</resultMap>
+
+	<resultMap id="lawofficeMap" type="lawoffice">
+		<result property="cooperateId" column="ID" />
+		<result property="user.uid" column="user_id" />
+		<result property="province.areaId" column="law_province" />
+		<result property="city.areaId" column="law_city" />
+		<result property="license" column="business_code" />
+		<result property="telephone" column="law_tel" />
+		<result property="email" column="law_email" />
+		<result property="homepage" column="law_url" />
+		<result property="regtime" column="law_time" typeHandler="dateTypeHandler" />
+		<result property="introduction" column="law_summary" />
+
+
+		<result property="legalPerson" column="law_boss" />
+		<result property="address" column="law_addr" />
+		<result property="postCode" column="post_no" />
+	</resultMap>
+
+	<resultMap id="lawyerMap" type="lawyer">
+		<result property="cooperateId" column="ID" />
+		<result property="user.uid" column="user_id" />
+		<result property="province.areaId" column="lawyer_province" />
+		<result property="city.areaId" column="lawyer_city" />
+		<result property="license" column="lawyer_code" />
+		<result property="telephone" column="lawyer_tel" />
+		<result property="email" column="lawyer_email" />
+		<result property="homepage" column="lawyer_url" />
+		<result property="regtime" column="lawyer_time" typeHandler="dateTypeHandler" />
+		<result property="introduction" column="lawyer_summary" />
+
+
+		<result property="lawOffice.cooperateId" column="lawoffice_id" />
+		<result property="specialty" column="lawyer_specialty" />
+	</resultMap>
+
+	<resultMap id="lawCategoryMap" type="lawcategory">
+		<result property="catId" column="g_id" />
+		<result property="parentCategory.catId" column="p_id" />
+		<result property="catName" column="g_title" />
+		<result property="qg_ruler" column="qg_ruler" />
+		<result property="pv_values" column="pv_values" />
+	</resultMap>
+
+	<select id="selectCase" parameterType="int" resultMap="lawcaseMap">
+		select *
+		from cases where aid=#{caseId}
+	</select>
+	<select id="selectLawoffice" parameterType="int" resultMap="lawofficeMap">
+		select * from lawoffice where ID=#{officeId}
+	</select>
+	<select id="selectLawyer" parameterType="int" resultMap="lawyerMap">
+		select *
+		from lawyer where ID=#{lawyerId}
+	</select>
+	<select id="selectLawCategory" parameterType="int" resultMap="lawCategoryMap">
+		select * from q_group where g_id=#{catId}
+	</select>
+
+
+	<select id="selectAllCases" resultMap="lawcaseMap">
+		select * from cases
+	</select>
+
+	<select id="selectAllOffices" resultMap="lawofficeMap">
+		select * from lawoffice
+	</select>
+	<select id="selectAllLawCategoris" resultMap="lawCategoryMap">
+		select * from
+		q_group
+	</select>
+	<select id="selectAllLawyers" resultMap="lawyerMap">
+		select * from lawyer
+	</select>
+	<select id="selectAllCasesCount" resultType="long">
+		select count(1) from
+		cases
+	</select>
+	<select id="selectAllLawofficeCount" resultType="long">
+		select count(1)
+		from lawoffice
+	</select>
+	<select id="selectAllLawyersCount" resultType="long">
+		select count(1)
+		from lawyer
+	</select>
+
+	<select id="getLawOfficeRanking" resultType="map">
+		SELECT o.ID, sum(
+		a.get_score ) AS score
+		FROM lawoffice o, answers a, lawyer l
+		WHERE
+		l.lawoffice_id = o.ID AND l.user_id = a.u_id
+		GROUP BY o.ID
+		ORDER BY
+		score DESC
+	</select>
+
+	<update id="passLawCase" parameterType="object">
+		update cases set
+		del_flag='0',check_flag='1' where aid in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+
+	</update>
+	<update id="deleteLawCase" parameterType="object">
+		update cases set
+		del_flag='1',check_flag='1' where aid in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="updateLawCategory" parameterType="map">
+		update q_group set
+		g_title=#{value0},p_id=#{value1} where g_id=#{value2}
+	</update>
+
+	<!-- case_submit_date=now(), case_user_ip='$u_ip', -->
+	<update id="editLawCase" parameterType="lawcase">
+		update cases set
+		case_title=#{title},
+		case_cate=#{category.catId},
+		case_province=#{province.areaId},
+		case_city=#{city.areaId},
+		case_locate=#{location},
+		case_value=#{price},
+		case_offer=#{offer},
+		case_desc=#{description},
+		case_mem=#{memo},
+		case_limit=#{validity},
+		case_todate=#{expireDate},
+		case_ispub=#{ispub},
+		case_pubchars=#{pubchars},
+		case_contact_name=#{contactName},
+		case_contact_email=#{contactEmail},
+		case_contact_tele=#{contactTelephone},
+		case_contact_mobile=#{contactMobile},
+		case_contact_fax=#{contactFax},
+		case_contact_address=#{contactAddress},
+		case_contact_postcode=#{contactPostcode},
+		case_end_flag='0'
+		where
+		aid=#{caseId}
+	</update>
+	<insert id="insertLawCase" parameterType="lawcase">
+		insert into cases(
+		u_id,case_title,case_cate,case_province,case_city,case_locate,case_value,
+		case_offer,case_desc,case_mem,case_limit,case_todate,case_ispub,case_pubchars,
+		case_contact_name,case_contact_email,case_contact_tele,case_contact_mobile,
+		case_contact_fax,case_contact_address,case_contact_postcode,case_submit_date,
+		case_user_ip,case_end_flag,pub_flag,del_flag
+		)
+		values(#{user.uid},#{title},#{category.catId},#{province.areaId},#{city.areaId},#{location},
+		#{price},#{offer},#{description},#{memo},#{validity},#{expireDate},#{ispub},
+		#{pubchars},#{contactName},#{contactEmail},#{contactTelephone},#{contactMobile},
+		#{contactFax},#{contactAddress},#{contactPostcode},now(),#{caseUserIp},'0','hidden','1'
+		)
+	</insert>
+
+	<insert id="insertLawCategory" parameterType="map">
+		insert into q_group
+		(g_title,p_id) values (#{value0},#{value1})
+	</insert>
+	<select id="mysqllastid" resultType="int">
+		SELECT LAST_INSERT_ID()
+	</select>
+	<select id="foundrows" resultType="long">
+		SELECT FOUND_ROWS()
+	</select>
+
+	<insert id="insertLawOffice" parameterType="lawoffice">
+		insert into lawoffice(
+			user_id,
+			law_boss,
+			business_code,
+			law_addr,
+			post_no,
+			law_province,
+			law_city,
+			law_tel,
+			law_email,
+			law_url,
+			law_summary) values(	
+			#{user.uid},	
+			#{legalPerson},
+			#{license},
+			#{address},
+			#{postCode},
+			#{province.areaId},
+			#{city.areaId},
+			#{telephone},
+			#{email},
+			#{homepage},
+			#{introduction}
+		)
+	</insert>
+	<update id="updateLawOffice" parameterType="lawoffice">
+		update lawoffice set 
+			law_boss=#{legalPerson},
+			business_code=#{license},
+			law_addr=#{address},
+			post_no=#{postCode},
+			law_province=#{province.areaId},
+			law_city=#{city.areaId},
+			law_tel=#{telephone},
+			law_email=#{email},
+			law_url=#{homepage},
+			law_summary=#{introduction}
+			where ID=#{cooperateId}					
+	</update>
+
+	<insert id="insertLawyer"  parameterType="lawyer">
+	insert into lawyer(
+		user_id,
+		lawoffice_id,
+		lawyer_province,
+		lawyer_city,
+		lawyer_url,
+		lawyer_code,
+		lawyer_tel,
+		lawyer_specialty,
+		lawyer_email,
+		lawyer_summary
+	)values(
+		#{user.uid},
+		#{lawOffice.cooperateId},
+		#{province.areaId},
+		#{city.areaId},
+		#{homepage},
+		#{license},
+		#{telephone},
+		#{specialty},
+		#{email},
+		#{introduction}
+		)
+	
+	</insert>
+	<update id="updateLawyer" parameterType="lawyer">
+	</update>
+</mapper>

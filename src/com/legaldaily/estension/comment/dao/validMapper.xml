@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.legaldaily.estension.comment.valid">
+
+	<!-- select one answer -->
+	<select id="selectAllIDcard" resultType="map">
+		select user_id,tp_group,count(user_ip) as count,max(tp_time) as tpTime from tp_info group by user_id,tp_group order by tpTime desc limit 10000
+	</select>
+	<!-- select one answer -->
+	<select id="selectAllIP" resultType="map">
+		select user_ip,tp_group,count(user_ip) as count,max(tp_time) as tpTime from tp_info group by user_ip,tp_group
+	</select>
+	
+</mapper>

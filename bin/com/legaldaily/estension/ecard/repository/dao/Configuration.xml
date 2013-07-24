@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties resource="com/legaldaily/estension/ecard/repository/dao/config.properties" />
+	<settings>
+<!-- 		<setting name="cacheEnabled" value="true" /> -->
+		<setting name="lazyLoadingEnabled" value="false" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="useGeneratedKeys" value="false" />
+<!-- 		<setting name="enhancementEnabled" value="false" /> -->
+		<setting name="defaultExecutorType" value="SIMPLE" />
+		<setting name="defaultStatementTimeout" value="25000" />		
+	</settings>
+
+	<typeAliases>
+		<typeAlias alias="question" type="com.legaldaily.estension.ecard.model.question.Question" />
+		<typeAlias alias="answer" type="com.legaldaily.estension.ecard.model.question.Answer" />
+		<typeAlias alias="userinfo" type="com.legaldaily.estension.ecard.model.user.User" />
+		<typeAlias alias="score" type="com.legaldaily.estension.ecard.model.user.Score" />
+		<typeAlias alias="cond" type="com.legaldaily.estension.ecard.model.condition.Cond" />
+		<typeAlias alias="recommendation" type="com.legaldaily.estension.ecard.model.recommend.Recommendation" />
+		<typeAlias alias="post" type="com.legaldaily.estension.ecard.model.post.Post" />
+		<typeAlias alias="postCategory" type="com.legaldaily.estension.ecard.model.post.PostCategory" />
+		<typeAlias alias="userGroup" type="com.legaldaily.estension.ecard.model.user.UserGroup" />
+		<typeAlias alias="province" type="com.legaldaily.estension.ecard.model.area.Province" />
+		<typeAlias alias="city" type="com.legaldaily.estension.ecard.model.area.City" />
+		<typeAlias alias="lawcase" type="com.legaldaily.estension.ecard.model.law.LawCase" />
+		<typeAlias alias="lawoffice" type="com.legaldaily.estension.ecard.model.law.LawOffice" />
+		<typeAlias alias="lawyer" type="com.legaldaily.estension.ecard.model.law.Lawyer" />
+		<typeAlias alias="lawcategory" type="com.legaldaily.estension.ecard.model.law.LawCategory" />
+		<typeAlias alias="poststatus" type="com.legaldaily.estension.ecard.model.post.PostStatus" />
+		<typeAlias alias="svvalue" type="com.legaldaily.estension.ecard.model.side.SVValue" />
+		
+		<typeAlias alias="dateTypeHandler" type="com.legaldaily.estension.ecard.repository.dao.EcardDateTypeHandler" />
+		<typeAlias alias="stringTypeHandler" type="com.legaldaily.estension.ecard.repository.dao.EcardStringTypeHandler" />
+		<typeAlias alias="longTypeHandler" type="com.legaldaily.estension.ecard.repository.dao.EcardLongTypeHandler" />
+		<typeAlias alias="recommendTransient" type="com.legaldaily.estension.ecard.model.recommend.RecommendTransient" />
+		
+		<typeAlias alias="usercond" type="com.legaldaily.estension.ecard.model.condition.UserCondition" />
+		<typeAlias alias="answercond" type="com.legaldaily.estension.ecard.model.condition.AnswerCondition" />
+		<typeAlias alias="questioncond" type="com.legaldaily.estension.ecard.model.condition.QuestionCondition" />
+		
+		
+		
+	</typeAliases>
+
+	<environments default="ecard">
+		<environment id="ecard">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+				<property name="poolPingQuery" value="${pingquery}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+		<mapper resource="com/legaldaily/estension/ecard/service/qarecommend/recommendMapping.xml" />
+		<mapper resource="com/legaldaily/estension/ecard/service/qarecommend/answerMapper.xml" />
+		<mapper resource="com/legaldaily/estension/ecard/service/qarecommend/questionMapper.xml" />
+		<mapper resource="com/legaldaily/estension/ecard/service/users/userMapping.xml" />
+		<mapper resource="com/legaldaily/estension/ecard/service/post/postMapper.xml" />
+		<mapper resource="com/legaldaily/estension/ecard/service/area/areaMapper.xml" />
+		<mapper resource="com/legaldaily/estension/ecard/service/law/lawMapper.xml" />
+		<mapper resource="com/legaldaily/estension/ecard/service/side/sideMapper.xml" />
+	</mappers>
+</configuration>

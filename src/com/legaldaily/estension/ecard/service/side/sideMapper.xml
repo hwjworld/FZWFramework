@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.legaldaily.estension.ecard.side">
+
+	<!-- <cache type="org.mybatis.ehcache.EhcacheCache"/> -->
+
+	<resultMap id="svvalueMap" type="svvalue">
+		<result property="id" column="id" />
+		<result property="name" column="s_name" />
+		<result property="title" column="s_title" />
+		<result property="value" column="s_value" />
+		<result property="isGroupSetting" column="s_fg" />
+	</resultMap>
+
+	<!-- select one question -->
+	<select id="selectAllDefaultSettings" resultMap="svvalueMap">
+		select * from sv_value
+	</select>
+
+	<insert id="writelog" parameterType="map">
+		insert into
+		log_file(u_id,u_ip,obj_id,do_action,obj_cat)
+		values(#{value0},#{value1},#{value2},#{value3},#{value4})
+	</insert>
+	<insert id="insertPv" parameterType="string">
+		insert into date_pv (date_name,pv_values) values (#{date},'1')
+	</insert>
+	<update id="updatePv" parameterType="int">
+		update date_pv set pv_values=pv_values+1 where id=#{id}
+	</update>
+	<select id="selctPvIdByDate" parameterType="string" resultType="int">
+		select id from date_pv where date_name=#{date}
+	</select>
+</mapper>
